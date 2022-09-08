@@ -155,7 +155,7 @@ server.listen(port, host, () => {
 // './users.txt'
 // userString -> Sasha 123123
 function addUserToFile(userString) {
-    const file = path.join(process.cwd(), 'users.txt')
+    const file = path.join(process.cwd(), 'tmp', 'users.txt')
     const usersFromFile = fs.readFileSync(file, "utf8");
 
     if (!usersFromFile) {
@@ -166,7 +166,7 @@ function addUserToFile(userString) {
 }
 
 function getUsersFromFile() {
-    const file = path.join(process.cwd(), 'users.txt')
+    const file = path.join(process.cwd(), 'tmp', 'users.txt')
     const usersFromFile = fs.readFileSync(file, "utf8");
 
     if (usersFromFile === '') {
@@ -192,7 +192,7 @@ function checkUserInFile(phone) {
 }
 
 function getAllMessages() {
-    const file = path.join(process.cwd(), 'messages.txt')
+    const file = path.join(process.cwd(), 'tmp', 'messages.txt')
     const messages = fs.readFileSync(file, "utf8");
     if (!messages) {
         return [];
@@ -235,7 +235,7 @@ function getMessagesByPhone(our, his) {
 }
 
 function saveMessageToFile(msg) {
-    const fileName = path.join(process.cwd(), 'messages.txt')
+    const fileName = path.join(process.cwd(),'tmp','messages.txt')
     const messages = fs.readFileSync(fileName, "utf8");
 
     if (!messages) {
