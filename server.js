@@ -1,6 +1,7 @@
 const http = require("http");
 const fs = require("fs");
 const path = require('path');
+const tmp = require('os').tmpdir()
 
 const host = 'localhost';
 const port = 3000;
@@ -155,33 +156,35 @@ server.listen(port, host, () => {
 // './users.txt'
 // userString -> Sasha 123123
 function addUserToFile(userString) {
-    const file = path.join(process.cwd(), 'tmp', 'users.txt')
-    const usersFromFile = fs.readFileSync(file, "utf8");
-
-    if (!usersFromFile) {
+    const file = path.join(tmp, 'users.txt')
+    try {
+        const usersFromFile = fs.readFileSync(file, "utf8");
+        if (!usersFromFile) {
+            fs.writeFileSync(file, userString)
+        } else {
+            fs.writeFileSync(file, usersFromFile + "\n" + userString)
+        }
+    } catch (error) {
         fs.writeFileSync(file, userString)
-    } else {
-        fs.writeFileSync(file, usersFromFile + "\n" + userString)
     }
 }
 
 function getUsersFromFile() {
-    const file = path.join(process.cwd(), 'tmp', 'users.txt')
-    const usersFromFile = fs.readFileSync(file, "utf8");
-
-    if (usersFromFile === '') {
+    const file = path.join(tmp, 'users.txt')
+    try {
+        const usersFromFile = fs.readFileSync(file, "utf8");
+        return usersFromFile.split('\n').map((raw) => {
+            const arrayOfUser = raw.split(' ');
+            const nick = arrayOfUser[0];
+            const phone = arrayOfUser[1];
+            return {
+                nick,
+                phone
+            };
+        });
+    } catch(e) {
         return [];
-    }
-    
-    return usersFromFile.split('\n').map((raw) => {
-        const arrayOfUser = raw.split(' ');
-        const nick = arrayOfUser[0];
-        const phone = arrayOfUser[1];
-        return {
-            nick,
-            phone
-        };
-    });
+    }    
 }
 
 function checkUserInFile(phone) {
@@ -192,15 +195,19 @@ function checkUserInFile(phone) {
 }
 
 function getAllMessages() {
-    const file = path.join(process.cwd(), 'tmp', 'messages.txt')
-    const messages = fs.readFileSync(file, "utf8");
-    if (!messages) {
+    const file = path.join(tmp, 'messages.txt')
+    try {
+        const messages = fs.readFileSync(file, "utf8");
+        if (!messages) {
+            return [];
+        }
+    
+        return messages.split('\n').map((raw) => {
+            return JSON.parse(raw);
+        });
+    } catch (error) {
         return [];
-    }
-
-    return messages.split('\n').map((raw) => {
-        return JSON.parse(raw);
-    });
+    }    
 }
 
 function getMessagesByPhone(our, his) {
@@ -235,12 +242,15 @@ function getMessagesByPhone(our, his) {
 }
 
 function saveMessageToFile(msg) {
-    const fileName = path.join(process.cwd(),'tmp','messages.txt')
-    const messages = fs.readFileSync(fileName, "utf8");
-
-    if (!messages) {
+    const fileName = path.join(tmp, 'messages.txt');
+    try {
+        const messages = fs.readFileSync(fileName, "utf8");
+        if (!messages) {
+            fs.writeFileSync(fileName, msg)
+        } else {
+            fs.writeFileSync(fileName, messages + "\n" + msg)
+        }
+    } catch (error) {
         fs.writeFileSync(fileName, msg)
-    } else {
-        fs.writeFileSync(fileName, messages + "\n" + msg)
     }
 }
